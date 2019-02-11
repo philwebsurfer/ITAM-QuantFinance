@@ -1,0 +1,20 @@
+---
+title: "1 Portmanteau Test"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r include=FALSE}
+library(tidyverse)
+```
+
+```{r}
+sibm <- read.table("m-ibm3dx2608.txt", header=T)
+head(sibm)
+```
+
+```{r}
+Box.test(sibm, lag=5, type="Ljung")
+```
+
