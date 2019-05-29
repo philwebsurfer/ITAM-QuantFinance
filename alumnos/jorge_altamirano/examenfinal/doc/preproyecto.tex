@@ -1,0 +1,91 @@
+\documentclass[12pt,reqno,a4paper]{article}
+\usepackage[spanish]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx} %allows you to use jpg or png images. PDF is still recommended
+\usepackage[colorlinks=False]{hyperref} % add links inside PDF files
+\usepackage{amsmath}  % Math fonts
+\usepackage{amsfonts} %
+\usepackage{amssymb}  %
+\usepackage{multicol}
+%% Sets page size and margins. You can edit this to your liking
+\usepackage[top=1.3cm, bottom=2.0cm, outer=2.5cm, inner=2.5cm, heightrounded,
+marginparwidth=1.5cm, marginparsep=0.4cm, margin=2.5cm]{geometry}
+%% \usepackage[authoryear]{natbib}
+\usepackage[affil-it]{authblk}
+%% \bibliographystyle{abbrvnat}
+\usepackage{enumitem}
+
+\begin{document}
+	\title{ Presentaci\'on de Proyecto de Finanzas Cuantitativas}
+	\author{Jorge III Altamirano Astorga, Paulina G\'omez Mont Wickers, Francisco Jos\'e \'Alvarez Rojo}
+	\affil{Instituto Tecnol\'ogico Aut\'onomo de M\'exico}
+	\date{Febrero 2019}
+	\maketitle
+	
+	\begin{abstract}
+		Presentaremos como proyecto final un 	portafolio de acciones de la Bolsa Mexicana de Valores (BMV) que est\'e suficientemente balanceado para obtener buenos rendimientos aplicando los conceptos aprendidos en clase. Realizaremos Series de Tiempo con un Simulador de Gibbs.
+	\end{abstract}
+
+	\begin{multicols}{2}
+		\section{Introducci\'on}
+		Hemos visto durante el curso diversas herramientas con el fin de aplicar conocimientos estad\'isticos a finanzas. As\'i mismo se han observado los 2 enfoques m\'as comunes en el paper de Attilio Meucci \cite{meucci} en el cual $\mathbb{P}$ "\textit{extrapola el presente}" y $\mathbb{Q}$ "\textit{modela el futuro}".
+		
+		Trataremos de aproximar mediante el enfoque $\mathbb{P}$ e inferencia bayesiana mediante aproximaciones de un Simulador Gibbs con el fin de dar predicciones con un grado que consideremos suficiente para reportar buenos resultados.
+		
+		Utilizaremos nuestra intuici\'on y experiencia de cada uno de los autores del presente documento para desarrollar el este portafolio. As\'i mismo buscaremos realizar decisiones informadas con la lectura de medios electr\'onicos e impresos como \textit{El Financiero} y \textit{El Economista}.
+		
+		\section{Desarrollo}
+		Nos basaremos tambi\'en en el curso de Regresi\'on Avanzada \cite{nieto} para desarrollar nuestras series de tiempo. En el cual estipul\'o lo siguiente: "\textit{Los modelos dinámicos tienen su principal aplicación en el análisis de series de tiempo o en modelos de regresión con errores autocorrelacionados. En general son muy \'utiles en an\'alisis secuenciales debido a que la actualización de los par\'ametros debe de hacerse con base en datos obtenidos secuencialmente.}". Por esto relacionamos de manera directa nuestro conocimiento previo que tuvimos durante esta clase. 
+		
+		Las ecuaciones que planeamos utilizar.
+		\begin{equation} \label{eq:reglin}
+		Y_t = x_t' \beta + \epsilon
+		\end{equation}
+		
+		Donde el coeficiente $\beta$ cambia con el tiempo. $\epsilon$ es el error. Por lo que tenemos 2 ecuaciones m\'as:
+		\begin{subequations} \label{sub:observ}
+			Ecuaciones lineales sujetas a un tiempo atr\'as:
+			\begin{align}
+			\overbrace{Y_t = x_t' \beta_t + \epsilon_t, \epsilon_t \sim N(0, V_t^{-1})}^{Observacion} \\
+			\overbrace{\beta_t = G_t \beta_{t-1} + \omega_t, \omega_t \sim N(0, W_t^{-1})}^{Evolucion}
+			\end{align}
+		\end{subequations}
+	
+		Sea para los tiempos $t=1,2,\dots$; las precisiones $V^{-1}$, $W^{-1}$; G es una matriz. $x_t'$ contiene las variables predictoras. Ah\'i utilizaremos \'indices o indicadores macroecon\'omicos con el fin alimentar el modelo; as\'i mismo se utilizar\'a el precio en el pasado de la acci\'on.
+	
+		\section{Portafolio}
+		
+		Utilizaremos acciones que pertenezcan a distintos sectores econ\'omicos:
+		
+		\begin{itemize}
+			\item Infraestructura: Aeropuertos, Concesionarios carreteros, 
+			\item Consumo Masivo: Panificadoras, Refresqueras, Cervecer\'ias, Qu\'imicos de consumo en hogares, Supermercados
+			\item Industrial: Qu\'imicos industriales, Acereras y Metal\'urgicas, Fabricantes (e.g.:trenes, automotrices), Mineras
+			\item Sector Financiero: Bancos, Aseguradoras, Fondos de Inversi\'on
+			\item Sector Salud: Farmac\'euticas, Equipo M\'edico, Biotecnol\'ogicas
+		\end{itemize}
+	
+		Buscamos que nuestro portafolio sea balanceado y resiliente \textbf{a las turbulencias econ\'omicas y pol\'iticas} que sufre el pa\'is. Esto con el fin de que nuestro portafolio no sufra p\'erdidas netas al final de un periodo determinado (6 meses o un año).
+		
+		\section{Elaborac\'ion}
+		
+		Obtendremos los datos publicados por la BMV de 4 años de las acciones que conformaremos, as\'i como de los indicadores econ\'omicos mencionados para realizar una regresi\'on en nuestro \textit{sampleador Gibbs} de dichas acciones y observar el rendimiento a 12 meses. Con esto observar qu\'e tan acertado ha sido nuestro pron\'ostico.
+		
+		Realizaremos el pron\'ostico con distintas acciones hasta conformar un resultado y rendimiento que sea razonable (5\% en 12 meses). Por lo que no tenemos una lista de empresas hecha.
+		
+		
+	\end{multicols}
+	\begin{thebibliography}{1}
+
+	\bibitem{meucci} 
+	Meucci, Attilio.
+	\textit{'P' Versus 'Q': Differences and Commonalities between the Two Areas of Quantitative Finance (January 22, 2011)}. GARP Risk Professional, pp. 47-50, February 2011.
+	
+	\bibitem{nieto}Luis Enrique Nieto Barajas. \textit{Notas del Curso de Regresión Avanzada}. Instituto Tecnol\'ogico Aut\'onomo de M\'exico. Otoño-Invierno 2019
+	
+	\bibitem{wiener}Tam\'as Szabados. \textit{An elementary introduction to the Wiener process and stochastic integrals}.  arXiv:1008.1510v1 [math.PR]. August 2010.
+	
+	\bibitem{berd}Le\'on Berdichevsky Acosta, Rodrigo Lugo Fr\'ias. \textit{Notas del Curso de Finanzas Cuantitativas}. Instituto Tecnol\'ogico Aut\'onomo de M\'exico. Primavera-Verano 2019
+	\end{thebibliography}
+\end{document}
