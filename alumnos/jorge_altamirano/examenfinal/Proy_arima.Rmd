@@ -1,0 +1,128 @@
+---
+title: "Modelo_arima"
+author: "Paulina Gomez Mont W"
+date: "4/30/2019"
+output: html_document
+---
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+Obtenemos los retornos por fecha:
+```{r}
+datos <- read_csv("./datos/train_with_cierre/ap1_por_tema.csv")
+
+retornos <- datos[,c("Dates","cierre_next_day")] 
+```
+
+
+Dividimos los datos en prueba y validación, 75% para prueba y 25% para validación
+```{r}
+train <- retornos[1:608,]
+
+
+```
+En la siguiente gráfica podemos observar que no hay ninguna tendencia por lo tanto es necesario sacra diferencias ($I=0$) a los datos
+```{r}
+ggplot(train)+geom_line(aes(x=Dates,y=cierre_next_day))
+
+```
+Volvemos a los retornos clase "Serie de tiempo"
+```{r}
+train_ts <- train[,"cierre_next_day"] %>% ts()
+
+class(train_ts)
+```
+Corremos un modelo AR
+```{r}
+m1 = ar(train_ts[,1], method = 'mle',order.max=15)
+attributes(m1)
+```
+
+```{r}
+# Podemos ver la informaci??n incluida en la variable m1
+attributes(m1)
+
+# El orden seleccionado es
+m1$order
+# El AIC obtenido para diferentes ordenes (1-12) es
+m1$aic # Claramente el menor es p=4
+
+# Los par??metros estimados son
+m1
+m1$x.mean
+```
+
+
+Utilizando las grafica de autocorrelación obervamos q es significativa para Lag de 1, posteriormente se vuelven cero, esto nos indica que la marte MA del modelo ARIMA debe ser 1
+```{r}
+acf(train_ts, lag.max = 10, plot = TRUE)
+
+```
+Utilizando la Función de autocorrelación parcial obervamos q es significativa para Lag de 4, posteriormente se vuelven cero, esto nos indica que la marte AR del modelo ARIMA debe ser 4
+```{r}
+pacf(train_ts, lag.max = 10, plot = TRUE)
+
+```
+
+Dado que no observamos ninguna tendencia calculamos el siguiente modelo
+```{r}
+m3 <- arima(train_ts, order = c(4,0,1))
+m3 %>% attributes
+```
+
+```{r}
+m3$aic
+```
+Intentamos volviendo 0 el lag 2 y 3 de la parte AR ya que en la gráfica de PACF vemos que son similares a 0, sin embargo podemos observar que AIC es peor que en el caso sin retsricción
+```{r}
+m3_trans <- arima(train_ts, order = c(4,0,1), fixed=c(NA,0,0,NA,NA,NA))
+m3_trans %>% attributes
+```
+
+```{r}
+m3_trans$aic
+
+```
+Ahora ajustamos el modelo para el test
+```{r}
+
+
+m3$coef
+
+
+```
+
+```{r}
+datos_test <- retornos[605:nrow(retornos),]
+datos_test <- datos_test %>% mutate(
+  residuales=rep(0,nrow(datos_test)),
+  retorno_estimado=rep(0,nrow(datos_test))
+)
+
+
+datos_test$residuales[1:4] <- m3$residuals %>% tail(4)
+
+
+```
+Estimamos los retornos con los coeficientes del modelo arima estimados con el train
+```{r}
+for(i in 5:nrow(datos_test)){
+  
+  datos_test$retorno_estimado[i] <- m3$coef["intercept"]+m3$coef["ar1"]*datos_test$cierre_next_day[i-1]+m3$coef["ar2"]*datos_test$cierre_next_day[i-2]+m3$coef["ar3"]*datos_test$cierre_next_day[i-3]+m3$coef["ar4"]*datos_test$cierre_next_day[i-4]+m3$coef["ma1"]*datos_test$residuales[i-1]
+  datos_test$residuales[i] <- datos_test$retorno_estimado[i] -datos_test$cierre_next_day[i]
+  
+}
+
+```
+Obtenemos el valor cuadrático de los residuales
+```{r}
+t(datos_test$residuales) %*% datos_test$residuales
+
+```
+La suma del valor absoluto de los residuales
+```{r}
+
+abs(datos_test$residuales) %>% sum()
+```
