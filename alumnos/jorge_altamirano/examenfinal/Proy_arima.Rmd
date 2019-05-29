@@ -1,8 +1,10 @@
 ---
 title: "Modelo_arima"
-author: "Paulina Gomez Mont W"
+author: "Paulina Gomez Mont, Francisco Álvarez, Jorge Altamirano"
 date: "4/30/2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 ```{r}
 library(tidyverse)
